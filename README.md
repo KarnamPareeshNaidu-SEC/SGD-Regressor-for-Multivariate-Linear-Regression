@@ -23,81 +23,68 @@ Program to implement the multivariate linear regression model for predicting the
 Developed by: KARNAM PAREESH NAIDU
 RegisterNumber: 212225230129 
 */
-# Import required libraries
+#Manual Implementation using Numpy
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
 
 # ------------------------------
-# Step 1: Create the dataset
+# Step 1: Sample dataset
 # ------------------------------
-data = {
-    'Hours_Studied': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    'Marks_Scored':  [35, 40, 50, 55, 60, 65, 70, 75, 80, 85]
-}
+# Features: [Hours Studied, Attendance, Previous Marks]
+X = np.array([
+    [2, 80, 50],
+    [3, 60, 40],
+    [5, 90, 70],
+    [7, 85, 80],
+    [9, 95, 90]
+], dtype=float)
 
-df = pd.DataFrame(data)
-print("Dataset:")
-print(df)
-
-# ------------------------------
-# Step 2: Split into X and Y
-# ------------------------------
-X = df[['Hours_Studied']]   # Feature (2D)
-y = df['Marks_Scored']      # Target (1D)
+# Target: Marks Scored
+y = np.array([50, 45, 70, 80, 95], dtype=float)
 
 # ------------------------------
-# Step 3: Split data for training & testing
+# Step 2: Feature normalization
 # ------------------------------
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_mean = X.mean(axis=0)
+X_std = X.std(axis=0)
+X = (X - X_mean) / X_std
+
+# Add bias term (intercept)
+X = np.c_[np.ones(X.shape[0]), X]  # shape becomes (n_samples, n_features + 1)
 
 # ------------------------------
-# Step 4: Create and train the model
+# Step 3: Initialize weights
 # ------------------------------
-model = LinearRegression()
-model.fit(X_train, y_train)
+n_features = X.shape[1]
+weights = np.zeros(n_features)
+
+# Hyperparameters
+learning_rate = 0.01
+epochs = 1000
+
+# ------------------------------
+# Step 4: Stochastic Gradient Descent
+# ------------------------------
+for epoch in range(epochs):
+    for i in range(X.shape[0]):
+        xi = X[i]
+        yi = y[i]
+        y_pred = np.dot(xi, weights)
+        error = y_pred - yi
+        # Update weights
+        weights -= learning_rate * error * xi
+
+print("Trained Weights (including intercept):", weights)
 
 # ------------------------------
 # Step 5: Make predictions
 # ------------------------------
-y_pred = model.predict(X_test)
-
-# ------------------------------
-# Step 6: Evaluate the model
-# ------------------------------
-print("\nModel Evaluation:")
-print("Slope (m):", model.coef_[0])
-print("Intercept (c):", model.intercept_)
-print("Mean Squared Error:", mean_squared_error(y_test, y_pred))
-print("R² Score:", r2_score(y_test, y_pred))
-
-# ------------------------------
-# Step 7: Visualize results
-# ------------------------------
-plt.scatter(X, y, color='blue', label='Actual Data')
-plt.plot(X, model.predict(X), color='red', label='Regression Line')
-plt.xlabel('Hours Studied')
-plt.ylabel('Marks Scored')
-plt.title('Simple Linear Regression: Hours vs Marks')
-plt.legend()
-plt.show()
-
-# ------------------------------
-# Step 8: Predict for new data
-# ------------------------------
-hours = float(input("\nEnter number of study hours: "))
-predicted_marks = model.predict([[hours]])
-print(f"Predicted Marks for studying {hours} hours = {predicted_marks[0]:.2f}")
+y_pred_all = np.dot(X, weights)
+print("Predicted values:", y_pred_all)
 
 ```
 
 ## Output:
-<img width="802" height="412" alt="image" src="https://github.com/user-attachments/assets/176a7806-7407-4ef1-b38c-1e2837b0f738" />
-
-<img width="1157" height="670" alt="image" src="https://github.com/user-attachments/assets/8d79e1fc-05b8-4ac8-b666-d1555fa47ead" />
+<img width="1147" height="88" alt="image" src="https://github.com/user-attachments/assets/fb5031a6-ab70-4ec0-9028-3878b21d30ff" />
 
 
 ## Result:
