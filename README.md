@@ -23,56 +23,52 @@ Program to implement the multivariate linear regression model for predicting the
 Developed by: KARNAM PAREESH NAIDU
 RegisterNumber: 212225230129 
 */
-#Manual Implementation using Numpy
-import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+from sklearn.multioutput import MultiOutputRegressor
 
-# ------------------------------
-# Step 1: Sample dataset
-# ------------------------------
-# Features: [Hours Studied, Attendance, Previous Marks]
-X = np.array([
-    [2, 80, 50],
-    [3, 60, 40],
-    [5, 90, 70],
-    [7, 85, 80],
-    [9, 95, 90]
-], dtype=float)
+data = {
+    'Size': [1000, 1200, 1500, 1800, 2000],
+    'Bedrooms': [2, 2, 3, 3, 4],
+    'Price': [300000, 350000, 400000, 450000, 500000],
+    'Occupants': [2, 3, 4, 5, 6]
+}
 
-# Target: Marks Scored
-y = np.array([50, 45, 70, 80, 95], dtype=float)
+df = pd.DataFrame(data)
 
-# ------------------------------
-# Step 2: Feature normalization
-# ------------------------------
-X_mean = X.mean(axis=0)
-X_std = X.std(axis=0)
-X = (X - X_mean) / X_std
+X = df[['Size', 'Bedrooms']]
 
-# Add bias term (intercept)
-X = np.c_[np.ones(X.shape[0]), X]  # shape becomes (n_samples, n_features + 1)
+y = df[['Price', 'Occupants']]
 
-# ------------------------------
-# Step 3: Initialize weights
-# ------------------------------
-n_features = X.shape[1]
-weights = np.zeros(n_features)
+model = MultiOutputRegressor(SGDRegressor())
 
-# Hyperparameters
-learning_rate = 0.01
-epochs = 1000
+model.fit(X, y)
 
-# ------------------------------
-# Step 4: Stochastic Gradient Descent
-# ------------------------------
-for epoch in range(epochs):
-    for i in range(X.shape[0]):
-        xi = X[i]
-        yi = y[i]
-        y_pred = np.dot(xi, weights)
-        error = y_pred - yi
-        # Update weights
-        weights -= learning_rate * error * xi
+prediction = model.predict([[1600, 3]])
 
+print("Predicted Price:", prediction[0][0])
+print("Predicted Occupants:", prediction[0][1])
+
+plt.scatter(df['Size'], df['Price'])
+
+plt.plot(df['Size'], model.predict(X)[:,0])
+
+plt.xlabel("House Size")
+plt.ylabel("House Price")
+plt.title("House Price Prediction")
+
+plt.show()
+
+plt.scatter(df['Size'], df['Occupants'])
+
+plt.plot(df['Size'], model.predict(X)[:,1])
+
+plt.xlabel("House Size")
+plt.ylabel("Occupants")
+plt.title("Occupants Prediction")
+
+plt.show()
 print("Trained Weights (including intercept):", weights)
 
 # ------------------------------
@@ -84,8 +80,9 @@ print("Predicted values:", y_pred_all)
 ```
 
 ## Output:
-<img width="1147" height="88" alt="image" src="https://github.com/user-attachments/assets/fb5031a6-ab70-4ec0-9028-3878b21d30ff" />
+<img width="1125" height="649" alt="image" src="https://github.com/user-attachments/assets/3280e033-b81d-472b-841a-33c2e512168e" />
 
+<img width="1008" height="627" alt="image" src="https://github.com/user-attachments/assets/db564f36-c5e2-4230-b4a4-d718920d07b4" />
 
 ## Result:
 Thus the program to implement the multivariate linear regression model for predicting the price of the house and number of occupants in the house with SGD regressor is written and verified using python programming.
